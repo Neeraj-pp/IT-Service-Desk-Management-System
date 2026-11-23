@@ -90,6 +90,28 @@ flowchart LR
     EF --> DB[(SQLite / SQL Server)]
 ```
 
+## API overview
+
+Base route: `/api/ITSRPAPI`
+
+| Method | Endpoint | Purpose / access |
+|---|---|---|
+| POST | `/Register` | Public user registration; assigns the User role |
+| POST | `/Login` | Public login; returns a JWT access token |
+| GET | `/GetAllRequest` | Admin: paginated and filtered request list |
+| GET | `/GetRequestStatusCounts` | Admin: request status summary |
+| GET | `/GetRequestByuserName` | Retrieve requests subject to user/role checks |
+| POST | `/CreateNewSerRequest` | Authenticated user: create a service request |
+| GET | `/GetRequestById` | Retrieve a request subject to ownership/role checks |
+| PUT | `/reopen` | Original request owner: reopen an eligible resolved request once |
+| PUT | `/CloseRequest/{requestId}` | Admin: resolve a request |
+| DELETE | `/Delete/{requestId}` | Delete own request; Admin can delete any request |
+| GET | `/AuditHistory` | Admin: paginated and filtered audit history |
+| GET | `/AuditSummary` | Admin: audit activity summary |
+| GET | `/GetUser` | Retrieve profile subject to user/role checks |
+
+Interactive request/response schemas are available through Swagger when the API is running in Development.
+
 ## Getting started
 
 ### Prerequisites
