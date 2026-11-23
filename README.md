@@ -212,20 +212,39 @@ The test project includes repository tests and API integration tests for authent
 - Use a strong, unique Production JWT signing key and Admin password.
 - Review dependency vulnerability reports regularly.
 
-## Screenshots
+## Application screenshots
 
-Application screenshots will be added here after upload.
+The screenshots below show the main user flows and administrative capabilities of the application.
 
-Suggested images:
-- Login page
-- User dashboard with request list
-- Raise request form
-- Request details view
-- Admin dashboard and request filters
-- Audit history page
-- Swagger authentication/API view (optional)
+### 1. Login
 
-Use sanitized demo data only. Do not include real usernames, email addresses, passwords, JWTs, database contents, or personal information.
+![Application login page](screenshots/01-login.png)
+
+### 2. User dashboard
+
+![User dashboard](screenshots/02-user-dashboard.png)
+
+### 3. Raise a service request
+
+![Raise service request form](screenshots/03-raise-request.png)
+
+### 4. Admin dashboard
+
+![Admin dashboard](screenshots/04-admin-dashboard.png)
+
+### 5. Audit history
+
+![Administrative audit history](screenshots/05-audit-history.png)
+
+### 6. Request details
+
+![Service request details](screenshots/06-request-details.png)
+
+### 7. API documentation
+
+![Swagger API documentation](screenshots/07-swagger-api.png)
+
+> Screenshots should use demonstration data only. Do not publish real passwords, JWTs, personal information, or database contents.
 
 ## Future enhancements
 
