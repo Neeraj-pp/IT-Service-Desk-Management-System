@@ -11,25 +11,25 @@ namespace HelpDesk.DAL.Model
 
         [Required]
         [StringLength(50)]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         [Required]
         [StringLength(100)]
-        public string Details { get; set; }
+        public string Details { get; set; } = string.Empty;
 
         [Required]
         [StringLength(20)]
-        public string RaisedBy { get; set; }
+        public string RaisedBy { get; set; } = string.Empty;
 
         [Required]
         public DateTime RaisedOn { get; set; } = DateTime.Now;
 
         [Required]
         [StringLength(50)]
-        public string Justification { get; set; }
+        public string Justification { get; set; } = string.Empty;
 
         public int ReqStatus { get; set; }
 
-        public Status Status { get; set; }
+        public Status Status { get; set; } = null!;
     }
 }

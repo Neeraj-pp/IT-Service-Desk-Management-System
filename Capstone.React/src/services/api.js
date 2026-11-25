@@ -1,8 +1,12 @@
 import axios from "axios";
 import { logout } from "./auth";
 
+const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ||
+    "https://localhost:5193/api";
+
 const API = axios.create({
-    baseURL: "https://localhost:5193/api",
+    baseURL: API_BASE_URL,
     headers: {
         "Content-Type": "application/json"
     }

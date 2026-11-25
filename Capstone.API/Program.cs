@@ -116,6 +116,7 @@ if (string.Equals(
     );
 
 
+
     Console.WriteLine("=================================");
     Console.WriteLine("DATABASE VERIFICATION");
     Console.WriteLine($"Database path: {databasePath}");
@@ -157,7 +158,15 @@ builder.Services.AddDbContext<HelpDeskDbContext>(options =>
             );
         }
 
-        options.UseSqlServer(connectionString);
+        options.UseSqlServer(
+    connectionString,
+    sqlServerOptions =>
+    {
+        sqlServerOptions.MigrationsAssembly(
+            "Capstone.DAL.SqlServerMigrations"
+        );
+    }
+);
     }
 });
 
@@ -166,17 +175,27 @@ builder.Services.AddScoped<IRepository, Repository>();
 
 // CORS
 
+// CORS configuration
+var frontendOrigin =
+    builder.Configuration["Frontend:AllowedOrigin"];
+
+if (string.IsNullOrWhiteSpace(frontendOrigin))
+{
+    throw new InvalidOperationException(
+        "Frontend:AllowedOrigin is not configured."
+    );
+}
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactPolicy", policy =>
     {
         policy
-            .WithOrigins("http://localhost:64602")
+            .WithOrigins(frontendOrigin.Trim())
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
 });
-
 
 // Swagger JWT configuration
 builder.Services.AddSwaggerGen(options =>

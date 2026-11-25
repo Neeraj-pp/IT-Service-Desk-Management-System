@@ -19,7 +19,10 @@ namespace Capstone.API.Services
             var passwordHasher = scope.ServiceProvider
                 .GetRequiredService<IPasswordHasher<User>>();
 
-            // Find or create the Admin role.
+            // ==========================================
+            // 1. ENSURE BOTH ROLES EXIST
+            // ==========================================
+
             var adminRole = await context.Roles
                 .FirstOrDefaultAsync(r => r.RoleName == "Admin");
 
@@ -32,21 +35,124 @@ namespace Capstone.API.Services
 
                 context.Roles.Add(adminRole);
                 await context.SaveChangesAsync();
+
+                Console.WriteLine("Admin role created.");
             }
 
-            // Do not create another Admin if one already exists.
+            var userRole = await context.Roles
+                .FirstOrDefaultAsync(r => r.RoleName == "User");
+
+            if (userRole == null)
+            {
+                userRole = new Role
+                {
+                    RoleName = "User"
+                };
+
+                context.Roles.Add(userRole);
+                await context.SaveChangesAsync();
+
+                Console.WriteLine("User role created.");
+            }
+
+            // ==========================================
+            // 2. ENSURE REQUEST STATUSES EXIST
+            // ==========================================
+
+            var expectedStatuses = new Dictionary<int, string>
+            {
+                { 1, "New" },
+                { 2, "Resolved" },
+                { 3, "Reopened" }
+            };
+
+            var existingStatuses = await context.Statuses
+                .ToListAsync();
+
+            // A fresh database should receive statuses in
+            // the correct identity order: 1, 2 and 3.
+            if (existingStatuses.Count == 0)
+            {
+                foreach (var status in expectedStatuses)
+                {
+                    context.Statuses.Add(new Status
+                    {
+                        Description = status.Value
+                    });
+
+                    await context.SaveChangesAsync();
+
+                    Console.WriteLine(
+                        $"Status created: {status.Key} - {status.Value}"
+                    );
+                }
+            }
+            else
+            {
+                // Validate existing status IDs before proceeding.
+                foreach (var expected in expectedStatuses)
+                {
+                    var existingStatus = existingStatuses
+                        .FirstOrDefault(s =>
+                            s.StatusId == expected.Key);
+
+                    if (existingStatus == null)
+                    {
+                        throw new InvalidOperationException(
+                            $"Database is missing StatusId {expected.Key}. " +
+                            "Check the existing status records before seeding."
+                        );
+                    }
+
+                    // Update the old Closed label to Resolved.
+                    if (existingStatus.Description != expected.Value)
+                    {
+                        if (expected.Key == 2 &&
+                            existingStatus.Description == "Closed")
+                        {
+                            existingStatus.Description = "Resolved";
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException(
+                                $"Unexpected description for StatusId {expected.Key}. " +
+                                $"Expected '{expected.Value}', but found " +
+                                $"'{existingStatus.Description}'."
+                            );
+                        }
+                    }
+                }
+
+                await context.SaveChangesAsync();
+
+                Console.WriteLine("Request statuses already exist.");
+            }
+
+            // ==========================================
+            // 3. CHECK WHETHER ADMIN ALREADY EXISTS
+            // ==========================================
+
             bool adminExists = await context.Users
                 .AnyAsync(u => u.RoleId == adminRole.RoleId);
 
             if (adminExists)
             {
-                Console.WriteLine("Admin account already exists.");
+                Console.WriteLine(
+                    "Admin account already exists."
+                );
+
                 return;
             }
 
-            // Read initial Admin credentials from configuration.
-            string? userName = configuration["AdminSeed:UserName"];
-            string? password = configuration["AdminSeed:Password"];
+            // ==========================================
+            // 4. READ INITIAL ADMIN CREDENTIALS
+            // ==========================================
+
+            string? userName =
+                configuration["AdminSeed:UserName"];
+
+            string? password =
+                configuration["AdminSeed:Password"];
 
             if (string.IsNullOrWhiteSpace(userName) ||
                 string.IsNullOrWhiteSpace(password))
@@ -73,16 +179,21 @@ namespace Capstone.API.Services
                 );
             }
 
-            // Prevent username conflicts with existing accounts.
+            // Prevent username conflicts.
             bool usernameExists = await context.Users
                 .AnyAsync(u => u.UserName == userName);
 
             if (usernameExists)
             {
                 throw new InvalidOperationException(
-                    "The configured Admin username is already used by another account."
+                    "The configured Admin username is already used " +
+                    "by another account."
                 );
             }
+
+            // ==========================================
+            // 5. CREATE INITIAL ADMIN ACCOUNT
+            // ==========================================
 
             var adminUser = new User
             {
@@ -92,13 +203,18 @@ namespace Capstone.API.Services
             };
 
             adminUser.PasswordHash =
-                passwordHasher.HashPassword(adminUser, password);
+                passwordHasher.HashPassword(
+                    adminUser,
+                    password
+                );
 
             context.Users.Add(adminUser);
 
             await context.SaveChangesAsync();
 
-            Console.WriteLine("Initial Admin account created successfully.");
+            Console.WriteLine(
+                "Initial Admin account created successfully."
+            );
         }
     }
 }

@@ -182,7 +182,7 @@ namespace HelpDesk.DAL.Repository
         /// </summary>
         /// <param name="requestId">The service request identifier.</param>
         /// <returns>The matching service request, or null if not found.</returns>
-        public ServiceRequest GetRequestById(int requestId)
+        public ServiceRequest? GetRequestById(int requestId)
         {
             return _context.ServiceRequests
                 .Include(s => s.Status)
@@ -303,7 +303,7 @@ namespace HelpDesk.DAL.Repository
         /// </summary>
         /// <param name="userName">The username to search for.</param>
         /// <returns>The matching user, or null if not found.</returns>
-        public User GetUser(string userName)
+        public User? GetUser(string userName)
         {
             if (string.IsNullOrWhiteSpace(userName))
                 return null;

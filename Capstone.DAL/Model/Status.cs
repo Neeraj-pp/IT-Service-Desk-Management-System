@@ -11,6 +11,6 @@ namespace HelpDesk.DAL.Model
 
         [Required]
         [StringLength(50)]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
     }
 }

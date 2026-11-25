@@ -15,7 +15,7 @@ namespace HelpDesk.DAL.Repository
 
         int RaiseRequest(ServiceRequest newRequest);
 
-        ServiceRequest GetRequestById(int requestId);
+        ServiceRequest? GetRequestById(int requestId);
 
         bool ReOpenRequest(ServiceRequest request);
 
@@ -25,7 +25,7 @@ namespace HelpDesk.DAL.Repository
 
         bool DeleteRequest(int requestId);
 
-        User GetUser(string userName);
+        User? GetUser(string userName);
 
         (List<ServiceRequest> Items, int TotalCount)
     GetRequestsPaged(int pageNumber, int pageSize);
