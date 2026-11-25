@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Capstone.DAL\Capstone.DAL.csproj" />
+    <ProjectReference Include="..\Capstone.DAL.SqlServerMigrations\Capstone.DAL.SqlServerMigrations.csproj" />
   </ItemGroup>
 
 </Project>
