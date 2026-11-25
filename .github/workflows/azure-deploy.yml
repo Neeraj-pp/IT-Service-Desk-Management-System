@@ -30,26 +30,30 @@ permissions:
   contents: read
 
 jobs:
-  build-test-deploy:
+
+  # JOB 1: BUILD, TEST AND PUBLISH
+
+  build-and-test:
+    name: Build, Test and Publish API
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
-      id-token: write
 
     steps:
+
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup .NET 10
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
 
       - name: Restore dependencies
         run: dotnet restore Capstone.Tests/Capstone.Tests.csproj
 
-            - name: Run automated tests
+      - name: Run automated tests
         run: dotnet test Capstone.Tests/Capstone.Tests.csproj --configuration Release --no-restore
         env:
           Jwt__Issuer: CapstoneTestIssuer
@@ -60,16 +64,45 @@ jobs:
       - name: Publish API
         run: dotnet publish Capstone.API/Capstone.API.csproj --configuration Release --no-restore --output ./publish
 
+      - name: Upload published API
+        uses: actions/upload-artifact@v7
+        with:
+          name: it-service-desk-api
+          path: ./publish
+          if-no-files-found: error
+          retention-days: 1
+
+  # JOB 2: DEPLOY TO AZURE
+
+  deploy:
+    name: Deploy API to Azure App Service
+
+    needs: build-and-test
+
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+
+      - name: Download published API
+        uses: actions/download-artifact@v8
+        with:
+          name: it-service-desk-api
+          path: ./publish
+
       - name: Login to Azure using OIDC
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy API to Azure App Service
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: azure/webapps-deploy@v3
         with:
           app-name: servicedesk-api-neeraj-2026
