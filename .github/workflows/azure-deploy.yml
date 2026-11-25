@@ -49,8 +49,13 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore Capstone.Tests/Capstone.Tests.csproj
 
-      - name: Run automated tests
+            - name: Run automated tests
         run: dotnet test Capstone.Tests/Capstone.Tests.csproj --configuration Release --no-restore
+        env:
+          Jwt__Issuer: CapstoneTestIssuer
+          Jwt__Audience: CapstoneTestAudience
+          Jwt__Key: Capstone_Test_Key_12345678901234567890
+          Jwt__AccessTokenMinutes: 30
 
       - name: Publish API
         run: dotnet publish Capstone.API/Capstone.API.csproj --configuration Release --no-restore --output ./publish
