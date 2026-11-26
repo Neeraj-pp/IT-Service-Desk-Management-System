@@ -134,6 +134,41 @@ IT-Service-Desk-Management-System/
 └── CapstoneSolution.sln
 ~~~
 
+## Frontend application details
+
+The React client is documented separately in [Capstone.React/README.md](Capstone.React/README.md). It covers the actual route structure, User/Admin experiences, API client behavior, token/session handling, environment configuration, local build, linting, and Static Web Apps routing.
+
+## Testing and quality checks
+
+The solution includes the `Capstone.Tests` project with xUnit repository tests and ASP.NET Core API integration tests. The API test host uses an isolated test database through `CustomWebApplicationFactory`; test credentials/configuration are not Production credentials.
+
+Run the backend test suite from the repository root:
+
+~~~bash
+dotnet restore Capstone.Tests/Capstone.Tests.csproj
+dotnet test Capstone.Tests/Capstone.Tests.csproj --configuration Release
+~~~
+
+Build and lint the frontend:
+
+~~~bash
+cd Capstone.React
+npm ci
+npm run lint
+npm run build
+~~~
+
+The backend GitHub Actions workflow runs the automated test suite before publishing and deploying the API. The frontend workflow builds the React application before deploying it to Azure Static Web Apps. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for verified workflow run links and deployment evidence.
+
+## Database provider and migration notes
+
+The API supports two configured database providers:
+
+- **SQLite** is the local-development default from `Capstone.API/appsettings.json`. Its database file is generated locally and is not committed.
+- **SQL Server** is selected in the deployed environment using `Database__Provider=SqlServer` and the protected `ConnectionStrings__DefaultConnection` App Service setting. SQL Server migrations are maintained in the separate `Capstone.DAL.SqlServerMigrations` project.
+
+The separation keeps provider-specific EF Core migration histories explicit. Do not apply SQLite migrations to Azure SQL or publish any connection string or database credential.
+
 ## API overview
 
 Base route: **/api/ITSRPAPI**
