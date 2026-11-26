@@ -18,57 +18,57 @@ This document is the evidence register for the IT Service Desk Management System
 
 ### Login
 
-![Application login page](01-login.png)
+![Application login page](../screenshots/01-login.png)
 
 ### User dashboard
 
-![User dashboard](02-user-dashboard.png)
+![User dashboard](../screenshots/02-user-dashboard.png)
 
 ### Raise service request
 
-![Raise service request form](03-raise-request.png)
+![Raise service request form](../screenshots/03-raise-request.png)
 
 ### Admin dashboard
 
-![Admin dashboard](04-admin-dashboard.png)
+![Admin dashboard](../screenshots/04-admin-dashboard.png)
 
 ### Audit history
 
-![Audit history screen](05-audit-history.png)
+![Audit history screen](../screenshots/05-audit-history.png)
 
 ### Request details
 
-![Service request details](06-request-details.png)
+![Service request details](../screenshots/06-request-details.png)
 
 ### Swagger / OpenAPI documentation (Development)
 
-![Swagger API documentation](07-swagger-api.png)
+![Swagger API documentation](../screenshots/07-swagger-api.png)
 
 ## 2. Azure infrastructure proof
 
 ### Azure Static Web Apps
 
-![Azure Static Web Apps resource](08-azure-static-web-app-overview.png)
+![Azure Static Web Apps resource](../screenshots/08-azure-static-web-app-overview.png)
 
 ### Azure App Service
 
-![Azure App Service resource](09-azure-app-service-overview.png)
+![Azure App Service resource](../screenshots/09-azure-app-service-overview.png)
 
 ### Azure SQL Database
 
-![Azure SQL Database resource](10-azure-sql-database-overview.png)
+![Azure SQL Database resource](../screenshots/10-azure-sql-database-overview.png)
 
 ## 3. CI/CD deployment proof
 
 ### Backend workflow — successful deployment
 
-![Backend GitHub Actions run](11-github-api-actions-success.png)
+![Backend GitHub Actions run](../screenshots/11-github-api-actions-success.png)
 
 [Open the verified successful backend workflow run #3](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/runs/45583275795). The run completed both **Build, Test and Publish API** and **Deploy API to Azure App Service** successfully. Its job steps include automated tests, Release publish, artifact upload, Azure OIDC login, and App Service deployment.
 
 ### Frontend workflow — successful deployment
 
-![Frontend GitHub Actions run](12-github-frontend-actions-success.png)
+![Frontend GitHub Actions run](../screenshots/12-github-frontend-actions-success.png)
 
 [Open the verified successful frontend workflow run #10](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/runs/45761022603). The **Build and Deploy Job** completed successfully.
 
@@ -78,25 +78,25 @@ This document is the evidence register for the IT Service Desk Management System
 
 ### Successful live user registration
 
-![Live user registration](13-live-user-registration.png)
+![Live user registration](../screenshots/13-live-user-registration.png)
 
 ### Live User dashboard
 
-![Live User dashboard](14-live-user-dashboard.png)
+![Live User dashboard](../screenshots/14-live-user-dashboard.png)
 
 ### Live Admin dashboard
 
-![Live Admin dashboard](15-live-admin-dashboard.png)
+![Live Admin dashboard](../screenshots/15-live-admin-dashboard.png)
 
 ## 5. Azure SQL database proof
 
 ### Database schema and tables
 
-![Azure SQL schema and tables](16-azure-sql-schema-tables.png)
+![Azure SQL schema and tables](../screenshots/16-azure-sql-schema-tables.png)
 
 ### Persisted demonstration records
 
-![Azure SQL demo records](14-azure-sql-demo-records.png)
+![Azure SQL demo records](../screenshots/14-azure-sql-demo-records.png)
 
 ## Complete screenshot inventory
 
