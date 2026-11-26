@@ -1,41 +1,45 @@
 # IT Service Desk Management System
 
-A full-stack IT support portal built with **ASP.NET Core .NET 10, React 19, Entity Framework Core, and Azure SQL**. It supports user registration, JWT authentication, role-based access, service request workflows, and administrative audit history.
+A **full-stack, cloud-deployed IT Service Desk Management System** built with **ASP.NET Core .NET 10, React 19, Entity Framework Core, and Azure SQL**. The application supports user registration and login, JWT authentication, role-based access, service request management, and administrative audit history.
 
-[![API CI/CD](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/workflows/azure-deploy.yml/badge.svg)](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/workflows/azure-deploy.yml)
+[![Backend API CI/CD](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/workflows/azure-deploy.yml/badge.svg)](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/workflows/azure-deploy.yml)
 [![Frontend CI/CD](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/workflows/azure-static-web-apps-proud-stone-0019ac600.yml/badge.svg)](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/workflows/azure-static-web-apps-proud-stone-0019ac600.yml)
 
-## Live demo
+## Live application
 
-- **React application:** https://proud-stone-0019ac600.4.azurestaticapps.net
-- **ASP.NET Core API base URL:** https://servicedesk-api-neeraj-2026-fkgseadcemc2gpf0.centralindia-01.azurewebsites.net/api
-- **GitHub repository:** https://github.com/Neeraj-pp/IT-Service-Desk-Management-System
+| Component | Deployment |
+|---|---|
+| **React frontend** | [Open IT Service Desk Portal](https://proud-stone-0019ac600.4.azurestaticapps.net) |
+| **ASP.NET Core API** | [API base URL](https://servicedesk-api-neeraj-2026-fkgseadcemc2gpf0.centralindia-01.azurewebsites.net/api) |
+| **GitHub repository** | [Neeraj-pp/IT-Service-Desk-Management-System](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System) |
 
-The API is designed as a REST API, so opening its root URL may return HTTP 404. API routes are under **/api/ITSRPAPI**. Swagger is enabled for local Development, not Production. The hosted demo uses Azure free/shared tiers and may be temporarily unavailable if a platform quota is reached or the resources are stopped.
+The frontend, API, and relational database are deployed as separate Azure services. Live registration, user login, Admin login, dashboard access, and data persistence in Azure SQL have been tested.
+
+> **Demo availability:** The API is hosted on the Azure App Service F1 Free tier, which has strict resource quotas and no production availability SLA. The hosted demo can be temporarily unavailable if a quota is reached or Azure resources are stopped. The source code and local setup instructions remain available in this repository.
 
 ## Project overview
 
-The application provides separate experiences for standard users and administrators.
+The system provides separate experiences for standard users and administrators.
 
 - **Users** can register, sign in, raise support requests, view their own requests, and reopen eligible resolved requests.
-- **Administrators** can review all requests, resolve requests, inspect request details, manage records, and view audit history.
+- **Administrators** can review requests, resolve requests, inspect request details, manage records, and view audit history.
 - The API enforces authentication, role permissions, ownership checks, and request status transitions on the server.
-- Passwords are hashed with ASP.NET Core Identity's PasswordHasher; passwords are not stored as plain text.
+- Passwords are hashed with ASP.NET Core Identity's PasswordHasher; plain-text passwords are not stored.
 
-## Features
+## Key features
 
-### Authentication and access control
+### Authentication and authorization
 - Public user registration and login.
 - JWT Bearer authentication.
 - Role-based authorization for **Admin** and **User**.
 - Public registration assigns the standard **User** role.
-- Production Admin provisioning through environment-based configuration, only when an Admin account does not already exist.
+- Production Admin provisioning through environment-based credentials, only when an Admin account does not already exist.
 
 ### Service request management
 - Create and view service requests.
 - Paginated request listing and filtering.
 - Users can access their own requests; administrators can review all requests.
-- Status lifecycle: **New → Resolved → Reopened**.
+- Request status lifecycle: **New → Resolved → Reopened**.
 - Admins resolve requests; the original request owner can reopen an eligible resolved request once.
 - Request deletion is protected by role and ownership checks.
 
@@ -63,17 +67,17 @@ The application provides separate experiences for standard users and administrat
 | Backend CI/CD | GitHub Actions, Azure Login OIDC, Azure App Service deployment |
 | Frontend hosting and CI/CD | Azure Static Web Apps, GitHub Actions |
 
-## Deployed architecture
+## Cloud architecture
 
-The production frontend, API, and database are deployed as separate services.
+The production frontend, API, and database are deployed independently on Azure.
 
 ~~~mermaid
 flowchart TD
     B[User / Admin Browser]
     SWA[Azure Static Web Apps<br/>React + Vite]
     API[Azure App Service<br/>ASP.NET Core .NET 10 Web API]
-    AUTH[JWT Authentication<br/>Role & ownership authorization]
-    DAL[Repository + EF Core]
+    AUTH[JWT Authentication<br/>Role and ownership authorization]
+    DAL[Repository + Entity Framework Core]
     SQL[(Azure SQL Database)]
 
     B -->|HTTPS| SWA
@@ -83,9 +87,14 @@ flowchart TD
     DAL --> SQL
 ~~~
 
-The React app is built with the production API base URL at build time using **VITE_API_BASE_URL**. The API CORS policy allows the deployed Static Web Apps origin.
+- Azure Static Web Apps hosts the React/Vite frontend.
+- Azure App Service hosts the ASP.NET Core .NET 10 Web API.
+- Azure SQL Database stores production users, roles, statuses, service requests, and audit records.
+- Entity Framework Core uses a dedicated SQL Server migrations project for the deployed SQL Server schema.
+- The frontend is built with the production API base URL using the Vite build-time variable **VITE_API_BASE_URL**.
+- The API CORS configuration allows the deployed Static Web Apps origin.
 
-For the infrastructure configuration, environment variables, deployment steps, and operational notes, see [Deployment Guide](docs/DEPLOYMENT.md).
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the Azure configuration, deployment process, and operational notes.
 
 ## Repository structure
 
@@ -125,12 +134,6 @@ IT-Service-Desk-Management-System/
 └── CapstoneSolution.sln
 ~~~
 
-## Architecture and request lifecycle
-
-The React client calls the ASP.NET Core API through Axios. The API validates JWT bearer tokens and applies authorization rules before calling the repository. The repository uses Entity Framework Core to access the configured database. Audit events are handled by a dedicated audit service.
-
-The local default database provider is SQLite. Production uses SQL Server through the **Database__Provider=SqlServer** setting and the **Capstone.DAL.SqlServerMigrations** migration assembly.
-
 ## API overview
 
 Base route: **/api/ITSRPAPI**
@@ -151,7 +154,109 @@ Base route: **/api/ITSRPAPI**
 | GET | /AuditSummary | Admin: audit activity summary |
 | GET | /GetUser | Retrieve profile subject to user/role checks |
 
-Interactive request/response schemas are available through Swagger when running the API in Development.
+Swagger is enabled when the API runs in Development. It is intentionally not exposed by the current Production configuration.
+
+## CI/CD and deployment
+
+Two GitHub Actions workflows automate the deployments.
+
+### Backend workflow — Azure App Service
+
+File: **.github/workflows/azure-deploy.yml**
+
+1. Checks out the repository and installs the .NET 10 SDK.
+2. Restores the backend test project.
+3. Runs the automated tests with test-only JWT configuration.
+4. Publishes the API and uploads the publish output as a workflow artifact.
+5. Authenticates to Azure using GitHub OIDC.
+6. Deploys the published API to Azure App Service.
+
+The deployment job runs after the build/test job succeeds on pushes to **main**. The Azure deployment job uses a user-assigned managed identity with a federated credential. Azure identifiers are stored as GitHub Actions secrets; no long-lived Azure client secret or publish profile is stored in the workflow.
+
+### Frontend workflow — Azure Static Web Apps
+
+File: **.github/workflows/azure-static-web-apps-proud-stone-0019ac600.yml**
+
+1. Checks out the repository.
+2. Builds the React/Vite app from **Capstone.React**.
+3. Injects **VITE_API_BASE_URL** at build time.
+4. Publishes the **dist** output to Azure Static Web Apps.
+
+The Static Web Apps deployment token is stored as an encrypted GitHub Actions repository secret. The frontend and API have separate workflows, so each can be deployed independently.
+
+Workflow run evidence is included in the screenshots section below. For detailed configuration, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+## Screenshots and deployment evidence
+
+The repository includes screenshots of the original application UI and the deployed Azure solution. All images below are stored in the existing **screenshots/** folder.
+
+### Application UI
+
+| Screenshot | Description |
+|---|---|
+| ![Login page](screenshots/01-login.png) | Login page |
+| ![User dashboard](screenshots/02-user-dashboard.png) | User dashboard |
+| ![Raise request](screenshots/03-raise-request.png) | Raise service request form |
+| ![Admin dashboard](screenshots/04-admin-dashboard.png) | Admin dashboard |
+| ![Audit history](screenshots/05-audit-history.png) | Audit history |
+| ![Request details](screenshots/06-request-details.png) | Request details |
+| ![Swagger](screenshots/07-swagger-api.png) | Local Development Swagger/API documentation |
+
+### Azure infrastructure and CI/CD proof
+
+<details>
+<summary><strong>Azure resources and GitHub Actions evidence</strong></summary>
+
+**Azure Static Web Apps**
+
+![Azure Static Web App overview](screenshots/08-azure-static-web-app-overview.png)
+
+**Azure App Service (.NET 10)**
+
+![Azure App Service overview](screenshots/09-azure-app-service-overview.png)
+
+**Azure SQL Database resource**
+
+![Azure SQL Database overview](screenshots/10-azure-sql-database-overview.png)
+
+**Backend GitHub Actions — build, test, publish, and deploy**
+
+![Backend GitHub Actions success](screenshots/11-github-api-actions-success.png)
+
+**Frontend GitHub Actions — build and deploy**
+
+![Frontend GitHub Actions success](screenshots/12-github-frontend-actions-success.png)
+
+</details>
+
+### Live application and database verification
+
+<details>
+<summary><strong>Registration, dashboards, and Azure SQL evidence</strong></summary>
+
+**Live user registration**
+
+![Live user registration](screenshots/13-live-user-registration.png)
+
+**Live User dashboard**
+
+![Live User dashboard](screenshots/14-live-user-dashboard.png)
+
+**Live Admin dashboard**
+
+![Live Admin dashboard](screenshots/15-live-admin-dashboard.png)
+
+**Azure SQL schema and tables**
+
+![Azure SQL schema tables](screenshots/16-azure-sql-schema-tables.png)
+
+**Azure SQL demo records**
+
+![Azure SQL demo records](screenshots/14-azure-sql-demo-records.png)
+
+</details>
+
+> Screenshots use demonstration evidence. Never publish real passwords, password hashes, JWTs, cookies, connection strings, deployment tokens, personal information, or unredacted Azure configuration.
 
 ## Run locally
 
@@ -243,43 +348,7 @@ Run the test project from the solution root:
 dotnet test Capstone.Tests/Capstone.Tests.csproj --configuration Release
 ~~~
 
-The project includes repository tests and API integration tests for authentication, authorization, and request lifecycle behavior. The backend GitHub Actions workflow restores, tests, publishes, and deploys the API when relevant backend files change on **main**.
-
-## CI/CD workflows
-
-Two workflows are stored in **.github/workflows/**:
-
-1. **azure-deploy.yml** — restores .NET dependencies, runs the API test project, publishes the API, uploads the published artifact, authenticates to Azure using GitHub OIDC, and deploys to Azure App Service. Deployment runs on pushes to **main** after the build/test job succeeds. Azure identifiers are stored as GitHub Actions repository secrets; no Azure client secret or publish profile is stored in the workflow.
-2. **azure-static-web-apps-proud-stone-0019ac600.yml** — builds the Vite frontend and deploys the **dist** output to Azure Static Web Apps. The workflow injects **VITE_API_BASE_URL** at build time. The Static Web Apps deployment token is stored as a GitHub Actions secret.
-
-See [Deployment Guide](docs/DEPLOYMENT.md) for the configuration and deployment flow. See [Proof Capture Checklist](docs/PROOF-CAPTURE-CHECKLIST.md) for recommended screenshots to retain in the repository.
-
-## Screenshots
-
-The screenshots below document the application's main user flows and administrative features.
-
-### Login
-![Application login page](screenshots/01-login.png)
-
-### User dashboard
-![User dashboard](screenshots/02-user-dashboard.png)
-
-### Raise a service request
-![Raise service request form](screenshots/03-raise-request.png)
-
-### Admin dashboard
-![Admin dashboard](screenshots/04-admin-dashboard.png)
-
-### Audit history
-![Administrative audit history](screenshots/05-audit-history.png)
-
-### Request details
-![Service request details](screenshots/06-request-details.png)
-
-### API documentation
-![Swagger API documentation](screenshots/07-swagger-api.png)
-
-> Use demonstration data only in public screenshots. Do not publish real passwords, JWTs, cookies, connection strings, deployment tokens, personal information, or unredacted Azure configuration.
+The project includes repository tests and API integration tests for authentication, authorization, and request lifecycle behavior. The backend GitHub Actions workflow restores, tests, publishes, and deploys the API on relevant pushes to **main**.
 
 ## Security and operations
 
@@ -288,12 +357,12 @@ The screenshots below document the application's main user flows and administrat
 - Keep CORS restricted to the exact deployed frontend origin.
 - Use a strong, unique Production JWT signing key and Admin password.
 - Review npm and NuGet dependency vulnerability reports.
-- The App Service is on the F1 Free tier, which has strict CPU and bandwidth quotas. It is suitable for a learning/demo deployment, not a guaranteed-uptime production service. If a quota is exceeded, Azure can temporarily disable the app until the applicable quota reset.
-- Azure resource availability and free-tier eligibility can change. Check the Azure portal's current quota and cost views before relying on the hosted demo.
+- The App Service uses the F1 Free tier, which has strict CPU and bandwidth quotas. It is suitable for a learning/demo deployment, not a guaranteed-uptime production service. If a quota is exceeded, Azure can temporarily disable the app until the applicable quota reset.
+- Azure resource availability and free-tier eligibility can change. Check Azure Cost Management and resource-specific quota views before relying on the hosted demo.
 
 ## Possible future improvements
 
-- Add a dedicated health-check endpoint and central structured monitoring.
+- Add a dedicated health-check endpoint and centralized structured monitoring.
 - Expand frontend component tests and end-to-end browser tests.
 - Add automated dependency/security scanning to CI.
 - Improve accessibility and add richer operational dashboards.
