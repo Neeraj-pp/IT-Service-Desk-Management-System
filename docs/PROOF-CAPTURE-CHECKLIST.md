@@ -1,82 +1,133 @@
 # Portfolio Evidence and Screenshot Index
 
-The repository now contains screenshots of the original application UI, Azure deployment resources, GitHub Actions workflow runs, live application usage, and Azure SQL evidence.
+This document is the evidence register for the IT Service Desk Management System. The original images are kept in `screenshots/`; the sections below embed the most relevant evidence so reviewers can inspect it without hunting through the repository.
 
-All evidence images are stored directly in the existing **screenshots/** folder.
+## Quick evidence summary
 
-## Screenshot files currently in the repository
-
-| File | Evidence represented |
+| Area | Evidence files |
 |---|---|
-| screenshots/01-login.png | Original login UI |
-| screenshots/02-user-dashboard.png | Original User dashboard UI |
-| screenshots/03-raise-request.png | Original raise-request UI |
-| screenshots/04-admin-dashboard.png | Original Admin dashboard UI |
-| screenshots/05-audit-history.png | Original audit history UI |
-| screenshots/06-request-details.png | Original request details UI |
-| screenshots/07-swagger-api.png | Development Swagger/API documentation |
-| screenshots/08-azure-static-web-app-overview.png | Azure Static Web Apps resource overview |
-| screenshots/09-azure-app-service-overview.png | Azure App Service overview |
-| screenshots/10-azure-sql-database-overview.png | Azure SQL Database resource overview |
-| screenshots/11-github-api-actions-success.png | Successful backend GitHub Actions run |
-| screenshots/12-github-frontend-actions-success.png | Successful frontend GitHub Actions run |
-| screenshots/13-live-user-registration.png | Live user registration evidence |
-| screenshots/14-azure-sql-demo-records.png | Azure SQL demo record query results |
-| screenshots/14-live-user-dashboard.png | Live User dashboard |
-| screenshots/15-live-admin-dashboard.png | Live Admin dashboard |
-| screenshots/16-azure-sql-schema-tables.png | Azure SQL schema and tables |
+| User interface | Login, User dashboard, raise request, Admin dashboard, audit history, request details |
+| API documentation | Development Swagger screenshot |
+| Azure infrastructure | Static Web Apps, App Service, Azure SQL resource overviews |
+| Backend CI/CD | Successful API workflow screenshot and linked successful run |
+| Frontend CI/CD | Successful Static Web Apps workflow screenshot and linked successful run |
+| Live application | Registration, User dashboard, Admin dashboard |
+| Database | Azure SQL schema/tables and demonstration records |
 
-**Filename note:** Two uploaded files currently start with the numeric prefix 14. Their complete paths above are distinct. The README and Deployment Guide link to each exact filename, so neither file is ambiguous in the rendered documentation.
+## 1. Application UI evidence
 
-## What the CI/CD screenshots should prove
+### Login
 
-### Backend — screenshots/11-github-api-actions-success.png
+![Application login page](01-login.png)
 
-Capture the successful run details for **Build and Deploy IT Service Desk API**. The run summary should show both jobs green:
-- Build, Test and Publish API
-- Deploy API to Azure App Service
+### User dashboard
 
-Do not use the general **All workflows** page as the only backend proof, because it includes historical failed runs. Open the successful run itself.
+![User dashboard](02-user-dashboard.png)
 
-### Frontend — screenshots/12-github-frontend-actions-success.png
+### Raise service request
 
-Capture the successful run details for **Azure Static Web Apps CI/CD**. The run summary should show the **Build and Deploy Job** green. Open the successful run itself rather than relying only on the general workflow list.
+![Raise service request form](03-raise-request.png)
 
-## Security rules for public evidence
+### Admin dashboard
 
-- Use demonstration usernames and synthetic request descriptions.
-- Never show passwords, password hashes, JWTs, cookies, SQL connection strings/passwords, JWT signing keys, Static Web Apps deployment tokens, or GitHub secret values.
-- Do not publish the GitHub Secrets values page.
-- Hide subscription IDs, tenant IDs, personal email addresses, phone numbers, and billing details unless there is a specific reason to show them.
-- Review each screenshot before committing it. Remove or replace any image that exposes credentials or personal information.
+![Admin dashboard](04-admin-dashboard.png)
 
-## Optional evidence still worth adding
+### Audit history
 
-The current screenshots already establish the Azure resources, both CI/CD workflows, live registration, both dashboards, SQL schema, and persisted demo records. Additional optional evidence could include:
+![Audit history screen](05-audit-history.png)
 
-- a live request creation screen using a synthetic request;
-- the same request after Admin resolution;
-- the same request after the owner reopens it;
-- an audit history screen showing those events;
-- a safe API response showing a successful test request (with tokens and credentials removed).
+### Request details
 
-Only add these after performing the corresponding actions in the deployed application.
+![Service request details](06-request-details.png)
 
-## Screenshot upload commands
+### Swagger / OpenAPI documentation (Development)
 
-From the local repository root:
+![Swagger API documentation](07-swagger-api.png)
 
-~~~powershell
-git add screenshots/
-git status
-git diff --cached --stat
-~~~
+## 2. Azure infrastructure proof
 
-Review the staged file list and inspect the screenshots before committing. Then:
+### Azure Static Web Apps
 
-~~~powershell
-git commit -m "docs: add Azure deployment and live application evidence"
-git push origin main
-~~~
+![Azure Static Web Apps resource](08-azure-static-web-app-overview.png)
 
-If the push is rejected because GitHub has newer commits, synchronize with **git pull --rebase origin main** and push again. Never use force-push for evidence uploads.
+### Azure App Service
+
+![Azure App Service resource](09-azure-app-service-overview.png)
+
+### Azure SQL Database
+
+![Azure SQL Database resource](10-azure-sql-database-overview.png)
+
+## 3. CI/CD deployment proof
+
+### Backend workflow — successful deployment
+
+![Backend GitHub Actions run](11-github-api-actions-success.png)
+
+[Open the verified successful backend workflow run #3](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/runs/45583275795). The run completed both **Build, Test and Publish API** and **Deploy API to Azure App Service** successfully. Its job steps include automated tests, Release publish, artifact upload, Azure OIDC login, and App Service deployment.
+
+### Frontend workflow — successful deployment
+
+![Frontend GitHub Actions run](12-github-frontend-actions-success.png)
+
+[Open the verified successful frontend workflow run #10](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/runs/45761022603). The **Build and Deploy Job** completed successfully.
+
+**Current-status clarification:** A later frontend run #11 ([view run](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/runs/45761027414)) completed the React/Oryx build and uploaded the artifact, but Azure returned **Deployment Canceled** during deployment polling. Run #10 is the successful frontend deployment proof; run #11 is not a successful deployment. Always inspect the live Actions page for the latest status before claiming the newest pipeline is green.
+
+## 4. Live application verification
+
+### Successful live user registration
+
+![Live user registration](13-live-user-registration.png)
+
+### Live User dashboard
+
+![Live User dashboard](14-live-user-dashboard.png)
+
+### Live Admin dashboard
+
+![Live Admin dashboard](15-live-admin-dashboard.png)
+
+## 5. Azure SQL database proof
+
+### Database schema and tables
+
+![Azure SQL schema and tables](16-azure-sql-schema-tables.png)
+
+### Persisted demonstration records
+
+![Azure SQL demo records](14-azure-sql-demo-records.png)
+
+## Complete screenshot inventory
+
+| File | What it shows |
+|---|---|
+| `01-login.png` | Original login interface |
+| `02-user-dashboard.png` | Original User dashboard |
+| `03-raise-request.png` | Service request creation form |
+| `04-admin-dashboard.png` | Original Admin dashboard |
+| `05-audit-history.png` | Audit history interface |
+| `06-request-details.png` | Request details view |
+| `07-swagger-api.png` | Development Swagger/OpenAPI UI |
+| `08-azure-static-web-app-overview.png` | Azure Static Web Apps resource overview |
+| `09-azure-app-service-overview.png` | Azure App Service resource overview |
+| `10-azure-sql-database-overview.png` | Azure SQL Database resource overview |
+| `11-github-api-actions-success.png` | Backend GitHub Actions success screenshot |
+| `12-github-frontend-actions-success.png` | Frontend GitHub Actions success screenshot |
+| `13-live-user-registration.png` | Live user registration |
+| `14-azure-sql-demo-records.png` | SQL query results for demo records |
+| `14-live-user-dashboard.png` | Live User dashboard |
+| `15-live-admin-dashboard.png` | Live Admin dashboard |
+| `16-azure-sql-schema-tables.png` | Azure SQL schema/table view |
+
+**Filename note:** Two files use the numeric prefix `14`; their full paths are different and both are referenced explicitly. No files were renamed.
+
+## Evidence safety checklist
+
+Before adding or replacing screenshots, confirm they do not expose:
+- passwords, password hashes, JWTs, cookies, access tokens, or session values;
+- SQL connection strings, SQL passwords, or JWT signing keys;
+- GitHub Actions secret values or Azure deployment tokens;
+- unnecessary subscription/tenant identifiers, personal email addresses, phone numbers, or billing information.
+
+Use synthetic users and request content for public demonstrations. A screenshot of an Azure resource or a historical successful workflow is point-in-time evidence, not a promise of current uptime.
