@@ -216,3 +216,74 @@ Never commit or publish:
 - user password hashes from the Users table.
 
 Use Azure App Service environment settings for runtime secrets and GitHub Actions encrypted secrets for deployment authentication.
+
+## Verified GitHub Actions run references
+
+The following links identify completed deployment runs that were checked directly in GitHub Actions:
+
+| Component | Run | Result | What the run established |
+|---|---|---|---|
+| Backend API | [Run #3 — Build and Deploy IT Service Desk API](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/runs/45583275795) | **Success** | Build, automated tests, Release publish, artifact upload, Azure OIDC login, and App Service deployment all completed successfully. |
+| React frontend | [Run #10 — Azure Static Web Apps CI/CD](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/runs/45761022603) | **Success** | React build and Azure Static Web Apps deployment completed successfully. |
+
+A later frontend run, [Run #11](https://github.com/Neeraj-pp/IT-Service-Desk-Management-System/actions/runs/45761027414), built the React application successfully and uploaded the deployment artifact, but Azure reported **Deployment Canceled** during the deployment polling stage. This later run is not a successful deployment and must not be used as the green frontend deployment proof. The preceding successful Run #10 remains the verifiable successful deployment run. Check the Actions page for the newest status before presenting the repository as having a currently green pipeline.
+
+## Inline deployment evidence
+
+These are the repository's committed deployment proof images. Open each image in GitHub to inspect its complete contents.
+
+### Azure hosting resources
+
+**Azure Static Web Apps resource**
+
+![Azure Static Web Apps resource overview](../screenshots/08-azure-static-web-app-overview.png)
+
+**Azure App Service hosting the ASP.NET Core API**
+
+![Azure App Service overview](../screenshots/09-azure-app-service-overview.png)
+
+**Azure SQL Database resource**
+
+![Azure SQL Database overview](../screenshots/10-azure-sql-database-overview.png)
+
+### CI/CD deployment runs
+
+**Backend — GitHub Actions build, test, publish, and Azure deployment**
+
+![Backend GitHub Actions successful deployment](../screenshots/11-github-api-actions-success.png)
+
+**Frontend — GitHub Actions build and Azure Static Web Apps deployment**
+
+![Frontend GitHub Actions successful deployment](../screenshots/12-github-frontend-actions-success.png)
+
+The screenshots above are historical evidence captured for the successful runs. Their filenames do not prove that the newest workflow run is green; use the linked run pages for exact run status.
+
+### Live application and database verification
+
+**Live registration**
+
+![Live registration](../screenshots/13-live-user-registration.png)
+
+**Live User dashboard**
+
+![Live User dashboard](../screenshots/14-live-user-dashboard.png)
+
+**Live Admin dashboard**
+
+![Live Admin dashboard](../screenshots/15-live-admin-dashboard.png)
+
+**Azure SQL schema and tables**
+
+![Azure SQL schema and tables](../screenshots/16-azure-sql-schema-tables.png)
+
+**Azure SQL persisted demo records**
+
+![Azure SQL persisted demo records](../screenshots/14-azure-sql-demo-records.png)
+
+### Evidence interpretation
+
+- Azure resource screenshots demonstrate that the named hosting/database resources were provisioned.
+- Successful workflow screenshots and run links demonstrate the CI/CD deployment process completing at the time of those runs.
+- Live registration and dashboard screenshots demonstrate the deployed application's user-facing flows.
+- SQL schema and demo-record screenshots demonstrate the database structure and example persisted records.
+- These images are not a substitute for a current health check and do not guarantee future availability. The App Service F1 Free tier has strict quotas and no production availability SLA.
