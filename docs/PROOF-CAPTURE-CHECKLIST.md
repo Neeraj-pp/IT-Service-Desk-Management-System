@@ -1,87 +1,82 @@
-# Portfolio Evidence Capture Checklist
+# Portfolio Evidence and Screenshot Index
 
-Save the evidence screenshots directly in the existing repository **screenshots/** folder. Keep the seven existing application screenshots unchanged.
+The repository now contains screenshots of the original application UI, Azure deployment resources, GitHub Actions workflow runs, live application usage, and Azure SQL evidence.
 
-Capture genuine screenshots from your own app, Azure Portal, and GitHub Actions. Do not fabricate results or include credentials.
+All evidence images are stored directly in the existing **screenshots/** folder.
 
-## Existing application screenshots — keep these
+## Screenshot files currently in the repository
 
-- `screenshots/01-login.png`
-- `screenshots/02-user-dashboard.png`
-- `screenshots/03-raise-request.png`
-- `screenshots/04-admin-dashboard.png`
-- `screenshots/05-audit-history.png`
-- `screenshots/06-request-details.png`
-- `screenshots/07-swagger-api.png`
-
-## New Azure and CI/CD evidence — save in screenshots/
-
-| Filename | Capture |
+| File | Evidence represented |
 |---|---|
-| `08-azure-resource-group-overview.png` | Azure resource group resource list for this project. Hide subscription IDs and unrelated account information. |
-| `09-azure-static-web-app-overview.png` | Static Web App Overview showing resource name and default hostname. |
-| `10-azure-app-service-overview.png` | App Service Overview showing .NET 10 runtime and current Running state. |
-| `11-github-api-actions-success.png` | **Backend workflow run details** showing both Build, Test and Publish API and Deploy API to Azure App Service jobs green. |
-| `12-github-frontend-actions-success.png` | **Frontend workflow run details** showing the Azure Static Web Apps Build and Deploy Job green. |
-| `13-azure-sql-schema-tables.png` | Azure SQL Object Explorer/Query Editor showing the application tables and migration history table. |
-| `14-azure-sql-demo-records.png` | Query results with synthetic/demo users or service requests. Never show password hashes or personal data. |
+| screenshots/01-login.png | Original login UI |
+| screenshots/02-user-dashboard.png | Original User dashboard UI |
+| screenshots/03-raise-request.png | Original raise-request UI |
+| screenshots/04-admin-dashboard.png | Original Admin dashboard UI |
+| screenshots/05-audit-history.png | Original audit history UI |
+| screenshots/06-request-details.png | Original request details UI |
+| screenshots/07-swagger-api.png | Development Swagger/API documentation |
+| screenshots/08-azure-static-web-app-overview.png | Azure Static Web Apps resource overview |
+| screenshots/09-azure-app-service-overview.png | Azure App Service overview |
+| screenshots/10-azure-sql-database-overview.png | Azure SQL Database resource overview |
+| screenshots/11-github-api-actions-success.png | Successful backend GitHub Actions run |
+| screenshots/12-github-frontend-actions-success.png | Successful frontend GitHub Actions run |
+| screenshots/13-live-user-registration.png | Live user registration evidence |
+| screenshots/14-azure-sql-demo-records.png | Azure SQL demo record query results |
+| screenshots/14-live-user-dashboard.png | Live User dashboard |
+| screenshots/15-live-admin-dashboard.png | Live Admin dashboard |
+| screenshots/16-azure-sql-schema-tables.png | Azure SQL schema and tables |
 
-## New live application evidence — save in screenshots/
+**Filename note:** Two uploaded files currently start with the numeric prefix 14. Their complete paths above are distinct. The README and Deployment Guide link to each exact filename, so neither file is ambiguous in the rendered documentation.
 
-| Filename | Capture |
-|---|---|
-| `15-live-registration-success.png` | Successful registration confirmation for a demonstration account. Do not show a password. |
-| `16-live-user-dashboard.png` | Live User dashboard with synthetic/demo data. |
-| `17-live-admin-dashboard.png` | Live Admin dashboard with synthetic/demo data. |
-| `18-live-request-lifecycle-audit.png` | Evidence of a sample request being created, resolved, reopened, and recorded in audit history. Capture actual screens; this may require more than one screenshot if one screen cannot show the whole lifecycle. |
-| `19-live-api-smoke-test.png` | Safe API smoke-test response. An invalid-login HTTP 401 can prove the endpoint responds, but label it as an invalid-credentials smoke test, not successful authentication. |
+## What the CI/CD screenshots should prove
 
-## GitHub Actions: exactly which screen to capture
+### Backend — screenshots/11-github-api-actions-success.png
 
-### Backend — `11-github-api-actions-success.png`
+Capture the successful run details for **Build and Deploy IT Service Desk API**. The run summary should show both jobs green:
+- Build, Test and Publish API
+- Deploy API to Azure App Service
 
-1. Open the repository's **Actions** tab.
-2. In the left workflow list, select **Build and Deploy IT Service Desk API**.
-3. Select the latest successful run titled **Improve CI/CD workflow and configure test JWT settings** (commit `836ccf9` in the current run history).
-4. Capture the run summary page where both jobs are green:
-   - **Build, Test and Publish API**
-   - **Deploy API to Azure App Service**
-5. Prefer a screenshot with the workflow title, main branch, commit, and both green job boxes visible.
+Do not use the general **All workflows** page as the only backend proof, because it includes historical failed runs. Open the successful run itself.
 
-### Frontend — `12-github-frontend-actions-success.png`
+### Frontend — screenshots/12-github-frontend-actions-success.png
 
-1. Open the repository's **Actions** tab.
-2. In the left workflow list, select **Azure Static Web Apps CI/CD**.
-3. Select the latest successful run. In the current run history, the successful run titled **docs: expand exact production and Azure evidence checklist** (commit `4c8ab11`) is suitable.
-4. Capture the run summary page where **Build and Deploy Job** is green.
-5. Prefer a screenshot with the workflow title, main branch, commit, and green job box visible.
+Capture the successful run details for **Azure Static Web Apps CI/CD**. The run summary should show the **Build and Deploy Job** green. Open the successful run itself rather than relying only on the general workflow list.
 
-**Do not use the general All workflows list as either of these two screenshots.** It includes earlier failed runs as well as successful runs, and does not prove the individual workflow stages as clearly. Open each successful run separately.
+## Security rules for public evidence
 
-## Screenshot safety rules
-
-- Use synthetic demonstration usernames and request descriptions.
+- Use demonstration usernames and synthetic request descriptions.
 - Never show passwords, password hashes, JWTs, cookies, SQL connection strings/passwords, JWT signing keys, Static Web Apps deployment tokens, or GitHub secret values.
-- Do not capture the GitHub Secrets values page.
+- Do not publish the GitHub Secrets values page.
 - Hide subscription IDs, tenant IDs, personal email addresses, phone numbers, and billing details unless there is a specific reason to show them.
-- Crop unrelated browser tabs and desktop clutter where practical.
-- Only capture results that actually occurred. Leave a checklist item unfinished if you have not performed that test.
+- Review each screenshot before committing it. Remove or replace any image that exposes credentials or personal information.
 
-## Add the screenshots to Git
+## Optional evidence still worth adding
+
+The current screenshots already establish the Azure resources, both CI/CD workflows, live registration, both dashboards, SQL schema, and persisted demo records. Additional optional evidence could include:
+
+- a live request creation screen using a synthetic request;
+- the same request after Admin resolution;
+- the same request after the owner reopens it;
+- an audit history screen showing those events;
+- a safe API response showing a successful test request (with tokens and credentials removed).
+
+Only add these after performing the corresponding actions in the deployed application.
+
+## Screenshot upload commands
 
 From the local repository root:
 
-```powershell
+~~~powershell
 git add screenshots/
 git status
 git diff --cached --stat
-```
+~~~
 
-Review the staged file list and images. Confirm that there are no credentials or personal data. Then:
+Review the staged file list and inspect the screenshots before committing. Then:
 
-```powershell
+~~~powershell
 git commit -m "docs: add Azure deployment and live application evidence"
 git push origin main
-```
+~~~
 
-If the push is rejected because GitHub has newer commits, synchronize with `git pull --rebase origin main` and push again. Never use force-push for this evidence upload.
+If the push is rejected because GitHub has newer commits, synchronize with **git pull --rebase origin main** and push again. Never use force-push for evidence uploads.
