@@ -1,6 +1,6 @@
 # Azure Deployment Guide
 
-This guide documents the current hosting layout and the GitHub Actions deployment process for the IT Service Desk Management System.
+This guide documents the deployed hosting layout, GitHub Actions workflows, and verification evidence for the IT Service Desk Management System.
 
 ## Live endpoints
 
@@ -15,9 +15,9 @@ This guide documents the current hosting layout and the GitHub Actions deploymen
 | SQL logical server | sql-servicedesk-neeraj-2026 |
 | SQL database | sqldb-servicedesk |
 
-Do not treat these URLs as a permanent uptime guarantee. The resources are on learning/free tiers and can be paused or disabled by quota, subscription, or platform conditions.
+The live frontend uses the deployed API URL. Registration, login, User/Admin dashboard access, and Azure SQL data persistence have been tested. The hosted resources use learning/free tiers and may be unavailable if a platform quota is reached, a subscription is disabled, or resources are stopped. This is a portfolio/demo deployment, not an uptime guarantee.
 
-## Architecture
+## Production architecture
 
 ~~~mermaid
 flowchart TD
@@ -37,16 +37,29 @@ flowchart TD
 
 The frontend and API are separate deployments. The API connects to Azure SQL with a dedicated SQL application login rather than the SQL Server administrator login.
 
-## Azure App Service configuration
+## Azure resources and configuration
 
-The API App Service uses the Linux .NET 10 runtime and currently runs on the F1 Free App Service plan.
+### Static Web Apps
 
-Application settings are configured in **App Service → Settings → Environment variables**. The important keys are:
+- Hosts the React/Vite frontend.
+- Source repository: Neeraj-pp/IT-Service-Desk-Management-System.
+- Branch: main.
+- App location: Capstone.React.
+- API location: empty; the API is hosted separately.
+- Output location: dist.
+- The workflow injects VITE_API_BASE_URL during the frontend build.
+- The repository includes Capstone.React/public/staticwebapp.config.json to route React Router paths back to index.html.
+
+### App Service
+
+The API App Service uses the Linux .NET 10 runtime and the F1 Free App Service plan.
+
+Application settings are configured in **App Service → Settings → Environment variables**. Important keys:
 
 | App setting | Purpose |
 |---|---|
-| ASPNETCORE_ENVIRONMENT | Set to Production |
-| Database__Provider | Set to SqlServer |
+| ASPNETCORE_ENVIRONMENT | Production |
+| Database__Provider | SqlServer |
 | ConnectionStrings__DefaultConnection | Azure SQL connection string; keep its value secret |
 | Jwt__Issuer | JWT issuer |
 | Jwt__Audience | JWT audience |
@@ -54,19 +67,19 @@ Application settings are configured in **App Service → Settings → Environmen
 | Jwt__AccessTokenMinutes | Token lifetime; application validates 5–120 minutes |
 | Frontend__AllowedOrigin | Exact Static Web Apps origin, without a trailing slash |
 
-If the database has not yet been seeded with an Admin account, also set **AdminSeed__UserName** and **AdminSeed__Password** securely for first-time provisioning. Do not leave initial credentials in source control or public documentation. The seeder checks for an existing Admin before requiring these values on later starts.
+If the database has not yet been seeded with an Admin account, configure AdminSeed__UserName and AdminSeed__Password securely for first-time provisioning. Do not place these values in source control or public documentation. The seeder checks for an existing Admin before requiring these values on later starts.
 
 ### CORS
 
-The production **Frontend__AllowedOrigin** is configured to match the Static Web Apps origin:
+The production Frontend__AllowedOrigin is configured to match the Static Web Apps origin:
 
 ~~~text
 https://proud-stone-0019ac600.4.azurestaticapps.net
 ~~~
 
-If the Static Web Apps hostname changes, update the API's **Frontend__AllowedOrigin** setting and save/apply the App Service configuration.
+If the Static Web Apps hostname changes, update the API's Frontend__AllowedOrigin setting and save/apply the App Service configuration.
 
-## Azure SQL configuration
+### Azure SQL
 
 Production database configuration uses:
 
@@ -77,19 +90,17 @@ Production database configuration uses:
 - Port: 1433
 - Application login: servicedesk_app
 
-The actual password and full connection string must remain in Azure App Service configuration and must never be written into this repository.
+The actual password and full connection string must remain in Azure App Service configuration and must never be committed.
 
-### SQL Server migrations
-
-The SQL Server EF Core migrations are stored in **Capstone.DAL.SqlServerMigrations**. Its design-time factory reads **AZURE_SQL_CONNECTION_STRING** from the local process environment when migration tooling is run. This is separate from the SQLite design-time factory in **Capstone.DAL**.
-
-The Azure SQL schema was applied using the SQL Server migration project. The API config selects **Capstone.DAL.SqlServerMigrations** as its SQL Server migrations assembly.
+The deployed SQL schema is managed by EF Core migrations in Capstone.DAL.SqlServerMigrations. The migration history is recorded in __EFMigrationsHistory. The production schema contains the application tables for users, roles, statuses, service requests, and audit logs.
 
 ## GitHub Actions CI/CD
 
+The repository contains two independent workflows.
+
 ### Backend: .github/workflows/azure-deploy.yml
 
-The workflow:
+The backend workflow:
 
 1. Checks out the repository.
 2. Installs the .NET 10 SDK.
@@ -100,33 +111,51 @@ The workflow:
 7. Uses azure/login with OIDC to authenticate to Azure.
 8. Deploys the artifact to the servicedesk-api-neeraj-2026 App Service.
 
-The deployment job runs only for pushes to **main** after the build-and-test job succeeds. Pull requests can run build/tests but do not deploy.
+The deployment job runs only for pushes to main after the build-and-test job succeeds. Pull requests can run build/tests but do not deploy.
 
-The GitHub repository uses these encrypted Actions secrets:
-
+The GitHub repository uses encrypted Actions secrets for:
 - AZURE_CLIENT_ID
 - AZURE_TENANT_ID
 - AZURE_SUBSCRIPTION_ID
 
-The workflow requests **id-token: write** only in the deployment job. Azure trusts the GitHub branch identity through a federated credential on the user-assigned managed identity. No long-lived Azure client secret or publish profile is needed.
+The workflow requests id-token: write only in the deployment job. Azure trusts the GitHub branch identity through a federated credential on a user-assigned managed identity. No long-lived Azure client secret or publish profile is stored in the workflow.
 
 ### Frontend: .github/workflows/azure-static-web-apps-proud-stone-0019ac600.yml
 
-The workflow uses the Azure Static Web Apps deployment action. Its build configuration is:
+The frontend workflow uses the Azure Static Web Apps deployment action.
 
 | Setting | Value |
 |---|---|
 | App location | ./Capstone.React |
-| API location | Empty (API is hosted separately) |
+| API location | Empty; API is hosted separately |
 | Output location | dist |
-| Build command | npm run build (detected by Oryx from package.json) |
+| Build command | npm run build, detected by Oryx from package.json |
 | Vite API variable | VITE_API_BASE_URL |
 
-The frontend workflow injects the production API base URL during the Vite build. Vite environment variables prefixed with VITE_ are included in the browser bundle; they must never contain secrets. The Static Web Apps deployment token is stored in a GitHub Actions secret.
+The workflow injects the production API base URL during the Vite build. Vite environment variables prefixed with VITE_ are included in the browser bundle and must never contain secrets. The Static Web Apps deployment token is stored in a GitHub Actions secret.
+
+## Deployment and functional verification evidence
+
+The repository stores the actual Azure and GitHub Actions screenshots in screenshots/.
+
+| Evidence | Screenshot |
+|---|---|
+| Static Web App resource | screenshots/08-azure-static-web-app-overview.png |
+| App Service runtime and status | screenshots/09-azure-app-service-overview.png |
+| Azure SQL database resource | screenshots/10-azure-sql-database-overview.png |
+| Backend build/test/deploy workflow | screenshots/11-github-api-actions-success.png |
+| Frontend build/deploy workflow | screenshots/12-github-frontend-actions-success.png |
+| Successful live registration | screenshots/13-live-user-registration.png |
+| Azure SQL demo records | screenshots/14-azure-sql-demo-records.png |
+| Live User dashboard | screenshots/14-live-user-dashboard.png |
+| Live Admin dashboard | screenshots/15-live-admin-dashboard.png |
+| Azure SQL schema and tables | screenshots/16-azure-sql-schema-tables.png |
+
+The screenshots are evidence captured from the deployed project. Do not infer guaranteed uptime from a successful deployment screenshot; App Service F1 has strict quotas and no production SLA.
 
 ## Frontend routing
 
-The React application uses BrowserRouter. The file **Capstone.React/public/staticwebapp.config.json** configures a navigation fallback to **/index.html**, allowing deep links and browser refreshes to be handled by React Router.
+The React application uses BrowserRouter. The file Capstone.React/public/staticwebapp.config.json configures a navigation fallback to /index.html, allowing direct links and browser refreshes to be handled by React Router.
 
 ## Local build commands
 
@@ -146,9 +175,9 @@ npm ci
 npm run build
 ~~~
 
-The frontend build output is **Capstone.React/dist**.
+The frontend build output is Capstone.React/dist.
 
-## Deployment verification
+## API smoke test
 
 The API login route is:
 
@@ -156,20 +185,13 @@ The API login route is:
 POST https://servicedesk-api-neeraj-2026-fkgseadcemc2gpf0.centralindia-01.azurewebsites.net/api/ITSRPAPI/Login
 ~~~
 
-Use a deliberate invalid test username/password for a smoke test. An HTTP 401 response demonstrates that the API route is responding and rejected the supplied credentials; it does not test successful authentication. Never put a real account password or JWT into a shell history, screenshot, issue, or public commit.
+A deliberate invalid-credentials test previously returned HTTP 401 from Kestrel. This confirmed the API route was responding and rejecting the supplied invalid credentials; it was not a successful login test. Successful login and registration were then tested through the live React application.
 
-A successful live functional check should separately confirm:
-- user registration returns success;
-- login returns an access token;
-- a user can create and view their own request;
-- an Admin can review and resolve requests;
-- eligible users can reopen a resolved request once;
-- audit history reflects the expected actions;
-- the resulting records are present in Azure SQL.
+Never place a real account password or JWT into shell history, a screenshot, an issue, or a public commit.
 
 ## F1 Free plan operational note
 
-The API App Service currently uses the F1 Free tier. It has strict CPU and outbound data quotas, and it does not provide a production availability SLA. During deployment troubleshooting, the site entered **QuotaExceeded** state and returned 503 responses. After the quota state returned to **Normal**, the application was reachable again.
+The API App Service currently uses the F1 Free tier. It has strict CPU and outbound data quotas, and it does not provide a production availability SLA. During deployment troubleshooting, the site entered QuotaExceeded state and returned 503 responses. After the quota state returned to Normal, the application became reachable again. A SQL server hostname typo in the App Service connection string was also identified and corrected during startup troubleshooting.
 
 Useful checks from Azure Cloud Shell:
 
@@ -190,6 +212,7 @@ Never commit or publish:
 - the Production JWT signing key;
 - Admin seed credentials;
 - the Azure Static Web Apps deployment token;
-- GitHub Actions secret values, cookies, or access tokens.
+- GitHub Actions secret values, cookies, or access tokens;
+- user password hashes from the Users table.
 
 Use Azure App Service environment settings for runtime secrets and GitHub Actions encrypted secrets for deployment authentication.
